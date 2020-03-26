@@ -4,7 +4,7 @@ ENV NODE_VERSION 13.11.0
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN groupadd --gid 1000 node \
-    && useradd --uid 1000 --gid node --shell /bin/bash --create-home node
+    && useradd -r --uid 1000 --gid node -G audio,video --shell /bin/bash --create-home node
 
 RUN ARCH= && dpkgArch="$(dpkg --print-architecture)" && \
     case "${dpkgArch##*-}" in \
@@ -18,6 +18,7 @@ RUN ARCH= && dpkgArch="$(dpkg --print-architecture)" && \
     esac && \
     apt update -y && \
     apt install -fuy -y curl gpg xz-utils && \
+    apt install -fuy -y libnss3 libxss1 && \
     set -ex && \
     for key in \
         94AE36675C464D64BAFA68DD7434390BDBE9B9C5 \
