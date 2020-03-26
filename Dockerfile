@@ -18,7 +18,13 @@ RUN ARCH= && dpkgArch="$(dpkg --print-architecture)" && \
     esac && \
     apt update -y && \
     apt install -fuy -y curl gpg xz-utils && \
-    apt install -fuy -y libnss3 libxss1 && \
+    apt -o Dpkg::Options::='--force-confnew' --force-yes -fuy install software-properties-common apt-transport-https ca-certificates curl git wget --assume-yes && \
+    wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+    echo 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main' | tee /etc/apt/sources.list.d/google-chrome.list && \
+    apt update -y && \
+    apt install -fuy -y libnss3 libxss1 google-chrome-stable && \
+    apt install -y google-chrome-stable chromium-chromedriver libgbm-dev xvfb libdbus-glib-1-2 libnss3 libxss1 libasound2 && \
+    apt -o Dpkg::Options::='--force-confnew' --allow-downgrades --allow-remove-essential --allow-change-held-packages -fuy dist-upgrade && \
     set -ex && \
     for key in \
         94AE36675C464D64BAFA68DD7434390BDBE9B9C5 \
@@ -45,6 +51,7 @@ RUN ARCH= && dpkgArch="$(dpkg --print-architecture)" && \
     rm "node-v$NODE_VERSION-linux-$ARCH.tar.xz" SHASUMS256.txt.asc SHASUMS256.txt && \
     ln -s /usr/local/bin/node /usr/local/bin/nodejs && \
     mkdir -p /home/node/app && \
+    chown -R node:node /home/node/app && \
     apt-get -qq -y autoremove && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
